@@ -21,7 +21,7 @@ const App = () => {
     })();
   }, []);
   return (
-    <LayoutComponent basename="CrudProjectJak">
+    <LayoutComponent>
       <ToastContainer />
       {doneAuth ? <Router /> : <LinearProgress />}
     </LayoutComponent>
