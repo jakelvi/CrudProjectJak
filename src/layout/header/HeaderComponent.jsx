@@ -7,7 +7,7 @@ import MenuItem from "@mui/material/MenuItem";
 import Menu from "@mui/material/Menu";
 import MenuIcon from "@mui/icons-material/Menu";
 import AccountCircle from "@mui/icons-material/AccountCircle";
-import { Avatar, Switch, Typography } from "@mui/material";
+import { Avatar, Switch } from "@mui/material";
 import Links from "./ui/Links";
 import LeftDrawerComponent from "./ui/LeftDrawerComponent";
 import { useState } from "react";
@@ -20,8 +20,11 @@ import DarkModeIcon from "@mui/icons-material/DarkMode";
 import LightModeIcon from "@mui/icons-material/LightMode";
 import axios from "axios";
 import { toast } from "react-toastify";
+import { getToken } from "../../service/storageService";
+import { jwtDecode } from "jwt-decode";
 
-const HeaderComponent = ({ isDarkTheme, onThemeChange }) => {
+const HeaderComponent = ({ isDarkTheme }) => {
+  const token = getToken();
   const [anchorEl, setAnchorEl] = useState(null);
   const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = useState(null);
   const [isOpen, setIsOpen] = useState(false);
@@ -30,7 +33,6 @@ const HeaderComponent = ({ isDarkTheme, onThemeChange }) => {
   const loggedIn = useSelector((bigPie) => bigPie.authSlice.loggedIn);
   const dispatch = useDispatch();
   const [userFromServer, setUserFromServer] = useState({});
-  const id = useSelector((bigPie) => bigPie.authSlice.id);
   const handleProfileMenuOpen = (event) => {
     setAnchorEl(event.currentTarget);
   };
@@ -64,8 +66,11 @@ const HeaderComponent = ({ isDarkTheme, onThemeChange }) => {
     document.location = "/";
   };
   React.useEffect(() => {
+    const newId = jwtDecode(token)._id;
     axios
-      .get(`https://monkfish-app-z9uza.ondigitalocean.app/bcard2/users/${id}`)
+      .get(
+        `https://monkfish-app-z9uza.ondigitalocean.app/bcard2/users/${newId}`
+      )
       .then(({ data }) => {
         setUserFromServer(data);
       })
@@ -81,7 +86,7 @@ const HeaderComponent = ({ isDarkTheme, onThemeChange }) => {
           theme: "colored",
         });
       });
-  }, []);
+  });
   const menuId = "primary-search-account-menu";
   const renderMenu = (
     <Menu
