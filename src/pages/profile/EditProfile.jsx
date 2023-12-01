@@ -1,6 +1,6 @@
 import { Box, Button, Container, TextField, Typography } from "@mui/material";
 import axios from "axios";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
@@ -27,11 +27,7 @@ const EditProfile = () => {
   });
   const [userFromServer, setUserFromServer] = useState({});
   const id = useSelector((bigPie) => bigPie.authSlice.id);
-  const userData = useSelector((bigPie) => bigPie.authSlice.userData);
-  // console.log(userData);
   const navigate = useNavigate();
-
-  let input = useRef(null);
 
   useEffect(() => {
     axios
@@ -59,7 +55,7 @@ const EditProfile = () => {
           theme: "colored",
         });
       });
-  }, []);
+  });
   console.log(userFromServer?.name?.first);
 
   const handleInputsChange = (e) => {
