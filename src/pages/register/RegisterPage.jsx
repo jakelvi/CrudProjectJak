@@ -10,6 +10,7 @@ import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import Typography from "@mui/material/Typography";
 import axios from "axios";
 import { normalizeData } from "./normalizeData";
+import { normalizeForCust } from "./normalizeForCust";
 import { validateRegister } from "../../validation/registerValidation";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
@@ -34,6 +35,7 @@ const RegisterPage = () => {
     zip: "",
   });
   const [errorsState, setErrorsState] = useState(null);
+  const [checked, setChecked] = useState(false);
   const navigate = useNavigate();
   const handleInputsChange = (e) => {
     setInputsValue((currentState) => ({
@@ -41,6 +43,11 @@ const RegisterPage = () => {
       [e.target.id]: e.target.value,
     }));
   };
+
+  const handleChange = (e) => {
+    setChecked(e.target.checked);
+  };
+
   const handleSubmit = async (event) => {
     try {
       event.preventDefault();
@@ -64,7 +71,12 @@ const RegisterPage = () => {
       const errors = validateRegister(inputsValue);
       if (errors) return;
 
-      let request = normalizeData(inputsValue);
+      let request;
+      if (checked) {
+        request = normalizeData(inputsValue);
+      } else {
+        request = normalizeForCust(inputsValue);
+      }
       const { data } = await axios.post("/users", request);
       toast("The registration was successful ", {
         position: "top-right",
@@ -106,7 +118,7 @@ const RegisterPage = () => {
       <Typography component="h1" variant="h5">
         Sign up
       </Typography>
-      <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 3 }}>
+      <Box component="form" sx={{ mt: 3 }}>
         <Grid container spacing={2}>
           <Grid item xs={12} sm={4}>
             <TextField
@@ -314,15 +326,24 @@ const RegisterPage = () => {
           </Grid>
           <Grid item xs={12}>
             <FormControlLabel
-              control={<Checkbox value="allowExtraEmails" color="primary" />}
+              control={
+                <Checkbox
+                  value="allowExtraEmails"
+                  color="primary"
+                  checked={checked}
+                  onChange={handleChange}
+                />
+              }
               label="Business Account"
             />
           </Grid>
         </Grid>
+
         <Button
           type="submit"
           fullWidth
           variant="contained"
+          onClick={handleSubmit}
           sx={{ mt: 3, mb: 2 }}
         >
           Sign Up

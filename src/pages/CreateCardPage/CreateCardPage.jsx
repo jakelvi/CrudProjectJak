@@ -13,7 +13,9 @@ import ROUTES from "../../routes/ROUTES";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { validateCreateCard } from "../../validation/cardValidation";
+import { getToken } from "../../service/storageService";
 
+let token = getToken();
 const CreateCardPage = () => {
   const navigate = useNavigate();
   const [inputsValue, setInputValue] = useState({
@@ -58,7 +60,7 @@ const CreateCardPage = () => {
         city: inputsValue.city,
         street: inputsValue.street,
         houseNumber: inputsValue.houseNumber,
-        zip: inputsValue.zip,
+        // zip: inputsValue.zip,
       });
       setErrorsState(joiResponse);
       if (joiResponse) return;
@@ -66,6 +68,9 @@ const CreateCardPage = () => {
       if (errors) return;
 
       const { data } = await axios.post("/cards", {
+        headers: {
+          "x-auth-token": `${token}`,
+        },
         title: inputsValue.title,
         subtitle: inputsValue.subtitle,
         description: inputsValue.description,
@@ -82,7 +87,7 @@ const CreateCardPage = () => {
           city: inputsValue.city,
           street: inputsValue.street,
           houseNumber: inputsValue.houseNumber,
-          zip: +inputsValue.zip,
+          // zip: +inputsValue.zip,
         },
       });
       navigate(ROUTES.HOME);

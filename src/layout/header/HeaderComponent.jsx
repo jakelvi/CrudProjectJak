@@ -19,12 +19,8 @@ import { darkThemeActions } from "../../store/darkThemeSlice";
 import DarkModeIcon from "@mui/icons-material/DarkMode";
 import LightModeIcon from "@mui/icons-material/LightMode";
 import axios from "axios";
-import { toast } from "react-toastify";
-import { getToken } from "../../service/storageService";
-import { jwtDecode } from "jwt-decode";
 
-const HeaderComponent = ({ isDarkTheme }) => {
-  const token = getToken();
+const HeaderComponent = ({ isDarkTheme, onThemeChange }) => {
   const [anchorEl, setAnchorEl] = useState(null);
   const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = useState(null);
   const [isOpen, setIsOpen] = useState(false);
@@ -33,6 +29,7 @@ const HeaderComponent = ({ isDarkTheme }) => {
   const loggedIn = useSelector((bigPie) => bigPie.authSlice.loggedIn);
   const dispatch = useDispatch();
   const [userFromServer, setUserFromServer] = useState({});
+  const id = useSelector((bigPie) => bigPie.authSlice.id);
   const handleProfileMenuOpen = (event) => {
     setAnchorEl(event.currentTarget);
   };
@@ -66,27 +63,13 @@ const HeaderComponent = ({ isDarkTheme }) => {
     document.location = "/";
   };
   React.useEffect(() => {
-    const newId = jwtDecode(token)._id;
     axios
-      .get(
-        `https://monkfish-app-z9uza.ondigitalocean.app/bcard2/users/${newId}`
-      )
+      .get(`https://monkfish-app-z9uza.ondigitalocean.app/bcard2/users/${id}`)
       .then(({ data }) => {
         setUserFromServer(data);
       })
-      .catch((err) => {
-        toast.error(err.response.data, {
-          position: "top-right",
-          autoClose: 5000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "colored",
-        });
-      });
-  });
+      .catch((err) => {});
+  }, []);
   const menuId = "primary-search-account-menu";
   const renderMenu = (
     <Menu
@@ -156,14 +139,12 @@ const HeaderComponent = ({ isDarkTheme }) => {
           </IconButton>
           <Links />
           <FilterComponent />
-          <Box sx={{ my: 2, p: 1 }}>
-            <Box sx={{ display: { xs: "none", md: "inline" } }}>
-              {isDarkTheme ? <DarkModeIcon /> : <LightModeIcon />}
-            </Box>
+          <Box sx={{ my: 2, p: 1, display: "flex", flexDirection: "row" }}>
+            {isDarkTheme ? <DarkModeIcon /> : <LightModeIcon />}
             <Switch
               checked={isDarkTheme}
               onChange={handleThemeToggle}
-              sx={{ mt: -2 }}
+              sx={{ mt: -1 }}
             />
           </Box>
           <Box sx={{ flexGrow: 1 }} />
