@@ -7,12 +7,11 @@ import axios from "axios";
 import homePageNormalization from "../home/homePageNormalization";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
-import { addLikedCard } from "../../store/likedCards";
-import { getToken } from "../../service/storageService";
+// import { getToken } from "../../service/storageService";
 import { CircleLoader } from "react-spinners";
 
 const FavPageComponent = () => {
-  const token = getToken();
+  // const token = getToken();
   const [dataFromServer, setDataFromServer] = useState([]);
   const [initialLoading, setInitialLoading] = useState(true);
   const userData = useSelector((bigPie) => bigPie.authSlice.userData);
@@ -54,9 +53,9 @@ const FavPageComponent = () => {
           like: !like,
         },
         {
-          headers: {
-            "x-auth-token": `${token}`,
-          },
+          // headers: {
+          //   "x-auth-token": `${token}`,
+          // },
         }
       );
 

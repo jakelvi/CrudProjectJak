@@ -13,16 +13,13 @@ import ROUTES from "../../routes/ROUTES";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { validateCreateCard } from "../../validation/cardValidation";
-import { getToken } from "../../service/storageService";
 
-let token = getToken();
 const CreateCardPage = () => {
   const navigate = useNavigate();
   const [inputsValue, setInputValue] = useState({
     title: "",
     subtitle: "",
     phone: "",
-    add: "",
     mail: "",
     description: "",
     web: "",
@@ -44,33 +41,32 @@ const CreateCardPage = () => {
     }));
   };
   const handleUpdateChangesClick = async (e) => {
-    try {
-      e.preventDefault();
-      const joiResponse = validateCreateCard({
-        title: inputsValue.title,
-        subTitle: inputsValue.subtitle,
-        phone: inputsValue.phone,
-        email: inputsValue.mail,
-        description: inputsValue.description,
-        web: inputsValue.web,
-        url: inputsValue.url,
-        alt: inputsValue.alt,
-        state: inputsValue.state,
-        country: inputsValue.country,
-        city: inputsValue.city,
-        street: inputsValue.street,
-        houseNumber: inputsValue.houseNumber,
-        // zip: inputsValue.zip,
-      });
-      setErrorsState(joiResponse);
-      if (joiResponse) return;
-      const errors = validateCreateCard(inputsValue);
-      if (errors) return;
+    e.preventDefault();
 
+    const joiResponse = validateCreateCard({
+      title: inputsValue.title,
+      subtitle: inputsValue.subtitle,
+      phone: inputsValue.phone,
+      email: inputsValue.mail,
+      description: inputsValue.description,
+      web: inputsValue.web,
+      url: inputsValue.url,
+      alt: inputsValue.alt,
+      state: inputsValue.state,
+      country: inputsValue.country,
+      city: inputsValue.city,
+      street: inputsValue.street,
+      houseNumber: inputsValue.houseNumber,
+      zip: inputsValue.zip,
+    });
+    setErrorsState(joiResponse);
+    if (joiResponse) return;
+
+    const errors = validateCreateCard(inputsValue);
+    if (errors) return;
+
+    try {
       const { data } = await axios.post("/cards", {
-        headers: {
-          "x-auth-token": `${token}`,
-        },
         title: inputsValue.title,
         subtitle: inputsValue.subtitle,
         description: inputsValue.description,
@@ -87,9 +83,10 @@ const CreateCardPage = () => {
           city: inputsValue.city,
           street: inputsValue.street,
           houseNumber: inputsValue.houseNumber,
-          // zip: +inputsValue.zip,
+          zip: +inputsValue.zip,
         },
       });
+      console.log(data);
       navigate(ROUTES.HOME);
     } catch (err) {
       toast.error(err.response.data, {
@@ -104,6 +101,7 @@ const CreateCardPage = () => {
       });
     }
   };
+
   return (
     <Container sx={{ padding: "65px" }}>
       <Typography variant="h2" sx={{ mb: 1, padding: "10px", pb: "0px" }}>
@@ -128,15 +126,15 @@ const CreateCardPage = () => {
         )}
         <TextField
           id="subtitle"
-          label="SubTitle"
+          label="Subtitle"
           variant="outlined"
           sx={{ mt: "10px" }}
           onChange={handleInputChange}
           value={inputsValue.subtitle}
           required
         />
-        {errorsState && errorsState.subTitle && (
-          <Alert severity="warning">{errorsState.subTitle}</Alert>
+        {errorsState && errorsState.subtitle && (
+          <Alert severity="warning">{errorsState.subtitle}</Alert>
         )}
         <TextField
           id="phone"
@@ -170,9 +168,6 @@ const CreateCardPage = () => {
           onChange={handleInputChange}
           value={inputsValue.web}
         />
-        {errorsState && errorsState.web && (
-          <Alert severity="warning">{errorsState.web}</Alert>
-        )}
         <TextField
           id="mail"
           label="Email"
@@ -193,9 +188,6 @@ const CreateCardPage = () => {
           onChange={handleInputChange}
           value={inputsValue.url}
         />
-        {errorsState && errorsState.url && (
-          <Alert severity="warning">{errorsState.url}</Alert>
-        )}
         <TextField
           id="alt"
           label="Alt"
@@ -204,9 +196,6 @@ const CreateCardPage = () => {
           onChange={handleInputChange}
           value={inputsValue.alt}
         />
-        {errorsState && errorsState.alt && (
-          <Alert severity="warning">{errorsState.alt}</Alert>
-        )}
         <TextField
           id="state"
           label="State"
@@ -215,9 +204,6 @@ const CreateCardPage = () => {
           onChange={handleInputChange}
           value={inputsValue.state}
         />
-        {errorsState && errorsState.state && (
-          <Alert severity="warning">{errorsState.state}</Alert>
-        )}
         <TextField
           id="country"
           label="Country"
@@ -274,9 +260,6 @@ const CreateCardPage = () => {
           onChange={handleInputChange}
           value={inputsValue.zip}
         />
-        {errorsState && errorsState.zip && (
-          <Alert severity="warning">{errorsState.zip}</Alert>
-        )}
       </Grid>
 
       <Button

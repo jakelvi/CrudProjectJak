@@ -9,7 +9,7 @@ import { useDispatch, useSelector } from "react-redux";
 import useQueryParams from "../../hooks/useQueryParams";
 import { toast } from "react-toastify";
 import { addLikedCard } from "../../store/likedCards";
-import { getToken } from "../../service/storageService";
+// import { getToken } from "../../service/storageService";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { CircleLoader } from "react-spinners";
 
@@ -25,7 +25,7 @@ const HomePage = () => {
   const userData = useSelector((bigPie) => bigPie.authSlice.userData);
   const query = useQueryParams();
   const dispatch = useDispatch();
-  let token = getToken();
+  // let token = getToken();
 
   useEffect(() => {
     axios
@@ -93,12 +93,12 @@ const HomePage = () => {
         `https://monkfish-app-z9uza.ondigitalocean.app/bcard2/cards/${_id}`,
         {
           like: !like,
-        },
-        {
-          headers: {
-            "x-auth-token": `${token}`,
-          },
         }
+        // {
+        //   headers: {
+        //     "x-auth-token": `${token}`,
+        //   },
+        // }
       );
       if (response.data.success) {
         dispatch(addLikedCard({ _id, like: !like }));

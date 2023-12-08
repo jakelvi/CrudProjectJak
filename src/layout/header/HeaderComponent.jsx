@@ -18,7 +18,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { darkThemeActions } from "../../store/darkThemeSlice";
 import DarkModeIcon from "@mui/icons-material/DarkMode";
 import LightModeIcon from "@mui/icons-material/LightMode";
-import axios from "axios";
 
 const HeaderComponent = ({ isDarkTheme, onThemeChange }) => {
   const [anchorEl, setAnchorEl] = useState(null);
@@ -28,8 +27,6 @@ const HeaderComponent = ({ isDarkTheme, onThemeChange }) => {
   const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
   const loggedIn = useSelector((bigPie) => bigPie.authSlice.loggedIn);
   const dispatch = useDispatch();
-  const [userFromServer, setUserFromServer] = useState({});
-  const id = useSelector((bigPie) => bigPie.authSlice.id);
   const handleProfileMenuOpen = (event) => {
     setAnchorEl(event.currentTarget);
   };
@@ -62,14 +59,14 @@ const HeaderComponent = ({ isDarkTheme, onThemeChange }) => {
     localStorage.removeItem("token");
     document.location = "/";
   };
-  React.useEffect(() => {
-    axios
-      .get(`https://monkfish-app-z9uza.ondigitalocean.app/bcard2/users/${id}`)
-      .then(({ data }) => {
-        setUserFromServer(data);
-      })
-      .catch((err) => {});
-  }, []);
+  // React.useEffect(() => {
+  //   axios
+  //     .patch(`https://monkfish-app-z9uza.ondigitalocean.app/bcard2/users/${id}`)
+  //     .then(({ data }) => {
+  //       setUserFromServer(data);
+  //     })
+  //     .catch((err) => {});
+  // }, []);
   const menuId = "primary-search-account-menu";
   const renderMenu = (
     <Menu
@@ -159,7 +156,7 @@ const HeaderComponent = ({ isDarkTheme, onThemeChange }) => {
                 onClick={handleProfileMenuOpen}
                 color="inherit"
               >
-                <Avatar alt="profile" src={userFromServer?.image?.url} />
+                <Avatar alt="profile" src={"userFromServer?.image?.url"} />
               </IconButton>
             )}
           </Box>
@@ -173,7 +170,7 @@ const HeaderComponent = ({ isDarkTheme, onThemeChange }) => {
                 onClick={handleMobileMenuOpen}
                 color="inherit"
               >
-                <Avatar alt="profile" src={userFromServer?.image?.url} />
+                <Avatar alt="profile" src={"userFromServer?.image?.url"} />
               </IconButton>
             )}
           </Box>
