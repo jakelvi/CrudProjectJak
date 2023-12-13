@@ -8,110 +8,35 @@ import {
   Button,
   Alert,
 } from "@mui/material";
-import { useNavigate, useParams } from "react-router-dom";
-import ROUTES from "../../routes/ROUTES";
-import axios from "axios";
-import { toast } from "react-toastify";
-import { validateCreateCard } from "../../validation/cardValidation";
-
-const CreateCardPage = () => {
-  const navigate = useNavigate();
-  const [inputsValue, setInputValue] = useState({
-    title: "",
-    subtitle: "",
-    phone: "",
-    mail: "",
-    description: "",
-    web: "",
-    url: "",
-    alt: "",
-    state: "",
-    country: "",
-    city: "",
-    street: "",
-    houseNumber: "",
-    zip: "",
-  });
-  const { id: _id } = useParams();
+import { useNavigate } from "react-router-dom";
+import { creationCard } from "./CreationCard";
+import { InputsValueObject } from "./InputsValueObject";
+const CreateCard = () => {
   const [errorsState, setErrorsState] = useState(null);
+  const navigate = useNavigate();
+  const [inputsValue, setInputValue] = useState(InputsValueObject());
+
   const handleInputChange = (e) => {
     setInputValue((currentState) => ({
       ...currentState,
       [e.target.id]: e.target.value,
     }));
   };
-  const handleUpdateChangesClick = async (e) => {
-    e.preventDefault();
-
-    const joiResponse = validateCreateCard({
-      title: inputsValue.title,
-      subtitle: inputsValue.subtitle,
-      phone: inputsValue.phone,
-      email: inputsValue.mail,
-      description: inputsValue.description,
-      web: inputsValue.web,
-      url: inputsValue.url,
-      alt: inputsValue.alt,
-      state: inputsValue.state,
-      country: inputsValue.country,
-      city: inputsValue.city,
-      street: inputsValue.street,
-      houseNumber: inputsValue.houseNumber,
-      zip: inputsValue.zip,
-    });
-    setErrorsState(joiResponse);
-    if (joiResponse) return;
-
-    const errors = validateCreateCard(inputsValue);
-    if (errors) return;
-
-    try {
-      const { data } = await axios.post("/cards", {
-        title: inputsValue.title,
-        subtitle: inputsValue.subtitle,
-        description: inputsValue.description,
-        phone: inputsValue.phone,
-        email: inputsValue.mail,
-        web: inputsValue.web,
-        image: {
-          url: inputsValue.url,
-          alt: inputsValue.alt,
-        },
-        address: {
-          state: inputsValue.state,
-          country: inputsValue.country,
-          city: inputsValue.city,
-          street: inputsValue.street,
-          houseNumber: inputsValue.houseNumber,
-          zip: +inputsValue.zip,
-        },
-      });
-      console.log(data);
-      navigate(ROUTES.HOME);
-    } catch (err) {
-      toast.error(err.response.data, {
-        position: "top-left",
-        autoClose: 5000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "light",
-      });
-    }
+  const handleCreationCard = () => {
+    creationCard(inputsValue, setErrorsState, navigate);
   };
-
   return (
-    <Container sx={{ padding: "65px" }}>
-      <Typography variant="h2" sx={{ mb: 1, padding: "10px", pb: "0px" }}>
+    <Container sx={{ mt: 12 }}>
+      <Typography variant="h3" sx={{ mb: 1, padding: "10px", pb: "0px" }}>
         Create Card{" "}
       </Typography>
       <Typography variant="body1" sx={{ mb: 1, padding: "3px", ml: "7px" }}>
         Put a new values in the correct input
       </Typography>
+
       <Divider sx={{ mb: 3 }} />
-      <Grid container flexDirection={"column"}>
+
+      <Grid container flexDirection={"column"} sx={{ width: "60vw" }}>
         <TextField
           id="title"
           label="Title"
@@ -126,7 +51,7 @@ const CreateCardPage = () => {
         )}
         <TextField
           id="subtitle"
-          label="Subtitle"
+          label="SubTitle"
           variant="outlined"
           sx={{ mt: "10px" }}
           onChange={handleInputChange}
@@ -168,13 +93,16 @@ const CreateCardPage = () => {
           onChange={handleInputChange}
           value={inputsValue.web}
         />
+        {errorsState && errorsState.web && (
+          <Alert severity="warning">{errorsState.web}</Alert>
+        )}
         <TextField
-          id="mail"
+          id="email"
           label="Email"
           variant="outlined"
           sx={{ mt: "10px" }}
           onChange={handleInputChange}
-          value={inputsValue.mail}
+          value={inputsValue.email}
           required
         />
         {errorsState && errorsState.email && (
@@ -188,6 +116,9 @@ const CreateCardPage = () => {
           onChange={handleInputChange}
           value={inputsValue.url}
         />
+        {errorsState && errorsState.url && (
+          <Alert severity="warning">{errorsState.url}</Alert>
+        )}
         <TextField
           id="alt"
           label="Alt"
@@ -196,6 +127,9 @@ const CreateCardPage = () => {
           onChange={handleInputChange}
           value={inputsValue.alt}
         />
+        {errorsState && errorsState.alt && (
+          <Alert severity="warning">{errorsState.alt}</Alert>
+        )}
         <TextField
           id="state"
           label="State"
@@ -204,6 +138,9 @@ const CreateCardPage = () => {
           onChange={handleInputChange}
           value={inputsValue.state}
         />
+        {errorsState && errorsState.state && (
+          <Alert severity="warning">{errorsState.state}</Alert>
+        )}
         <TextField
           id="country"
           label="Country"
@@ -260,16 +197,24 @@ const CreateCardPage = () => {
           onChange={handleInputChange}
           value={inputsValue.zip}
         />
-      </Grid>
+        {errorsState && errorsState.zip && (
+          <Alert severity="warning">{errorsState.zip}</Alert>
+        )}
+        <Button
+          variant="outlined"
+          sx={{
+            mt: 2,
+            mb: 2,
 
-      <Button
-        variant="outlined"
-        sx={{ mt: 2, width: "100%", ml: "0%", bgcolor: "lightskyblue" }}
-        onClick={handleUpdateChangesClick}
-      >
-        Create
-      </Button>
+            bgcolor: "lightskyblue",
+            color: "white",
+          }}
+          onClick={handleCreationCard}
+        >
+          Create
+        </Button>
+      </Grid>
     </Container>
   );
 };
-export default CreateCardPage;
+export default CreateCard;

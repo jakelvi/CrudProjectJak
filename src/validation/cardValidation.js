@@ -14,18 +14,17 @@ const createSchema = Joi.object({
     .email({ tlds: { allow: false } })
     .min(5)
     .required(),
-  web: Joi.string().min(14),
-  url: Joi.string().min(14),
-  alt: Joi.string().min(2).max(256),
-  state: Joi.string(),
+  web: Joi.string().min(14).allow(""),
+  url: Joi.string().min(14).allow(""),
+  alt: Joi.string().min(2).max(256).allow(""),
+  state: Joi.string().allow(""),
   country: Joi.string().required(),
   city: Joi.string().required(),
   street: Joi.string().required(),
   houseNumber: Joi.string().required(),
-  zip: Joi.string().required(),
+  zip: Joi.string().required().allow(""),
 });
 
-const validateCreateCard = (inputToCheck) =>
-  validation(createSchema, inputToCheck);
+const validateCard = (inputToCheck) => validation(createSchema, inputToCheck);
 
-export { validateCreateCard };
+export { validateCard };

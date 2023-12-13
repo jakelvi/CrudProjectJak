@@ -1,201 +1,191 @@
-import { Box, Button, Container, TextField, Typography } from "@mui/material";
+import { useEffect, useState } from "react";
+import Button from "@mui/material/Button";
+import TextField from "@mui/material/TextField";
+import Grid from "@mui/material/Grid";
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
 import axios from "axios";
-import React, { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { Alert, Container } from "@mui/material";
 import { toast } from "react-toastify";
-import ROUTES from "../../routes/ROUTES";
-import { normalizeData } from "../register/normalizeData";
-import { validateRegister } from "../../validation/registerValidation";
-
+import { useNavigate } from "react-router-dom";
+import { inputsValueObject } from "./inputsValueObject";
+import { EditProfileData } from "./EditProfileData";
+import { handleSubmit } from "./handleSubmit";
+import { getToken } from "../../service/storageService";
+import { jwtDecode } from "jwt-decode";
 const EditProfile = () => {
-  const [inputsValue, setInputsValue] = useState({
-    first: "",
-    middle: "",
-    last: "",
-
-    phone: "",
-    url: "",
-    alt: "",
-
-    state: "",
-    country: "",
-    city: "",
-    street: "",
-    houseNumber: "",
-    zip: "",
-  });
-  const [userFromServer, setUserFromServer] = useState({});
-  const id = useSelector((bigPie) => bigPie.authSlice.id);
   const navigate = useNavigate();
-
+  const [errorsState, setErrorsState] = useState(null);
+  const [inputsValue, setInputsValue] = useState(inputsValueObject);
+  let token = getToken();
+  let id = jwtDecode(token)._id;
   useEffect(() => {
     axios
-      .get(`https://monkfish-app-z9uza.ondigitalocean.app/bcard2/users/${id}`)
+      .get("/users/" + id)
       .then(({ data }) => {
-        console.log(data);
-        setUserFromServer(data);
-        setUserFromServer((old) => {
-          return {
-            ...old,
-            first: data.name.first,
-            last: data.name.last,
-          };
-        });
+        setInputsValue(EditProfileData(data));
       })
       .catch((err) => {
-        toast.error(err.response.data, {
-          position: "top-right",
-          autoClose: 5000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "colored",
+        toast.info("Error from server, can't get your profile to edit", {
+          position: toast.POSITION.TOP_CENTER,
         });
+        console.log(err);
       });
-  });
-  console.log(userFromServer?.name?.first);
-
+  }, [id]);
   const handleInputsChange = (e) => {
     setInputsValue((currentState) => ({
       ...currentState,
       [e.target.id]: e.target.value,
     }));
   };
-
-  const handleSubmit = async (event) => {
-    try {
-      event.preventDefault();
-      const errors = validateRegister(inputsValue);
-      if (errors) return;
-      let request = normalizeData(inputsValue);
-      await axios.put(
-        `https://monkfish-app-z9uza.ondigitalocean.app/bcard2/users/${id}`,
-        request
-      );
-      // console.log(event);
-
-      toast.success("The user has been updated successfully!", {
-        position: "top-center",
-        autoClose: 5000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "colored",
-      });
-      navigate(ROUTES.PROFILE);
-    } catch (err) {
-      toast.error(err.response.data, {
-        position: "top-right",
-        autoClose: 5000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "colored",
-      });
-    }
+  const handleEditProfile = (e) => {
+    e.preventDefault();
+    handleSubmit(inputsValue, setErrorsState, navigate, id);
   };
-
-  console.log(userFromServer?.address?.country);
   return (
-    <Container sx={{ mt: 12 }}>
-      <Typography variant="h3">Edit your profile</Typography>
-      <Box sx={{ mt: 1, display: "flex", flexDirection: "column" }}>
-        <TextField
-          sx={{ mt: 2 }}
-          id="firstName"
-          variant="outlined"
-          label="First name*"
-          value={userFromServer?.name?.first}
-          onChange={handleInputsChange}
-        />
-        <TextField
-          sx={{ mt: 2 }}
-          id="middleName"
-          variant="outlined"
-          label="Middle name"
-          defaultValue={`${userFromServer?.name?.middle}`}
-          onChange={handleInputsChange}
-        />
-        <TextField
-          sx={{ mt: 2 }}
-          id="lastName"
-          variant="outlined"
-          label="Last name*"
-          defaultValue={`${userFromServer?.name?.last}`}
-          onChange={handleInputsChange}
-        />
-        <TextField
-          sx={{ mt: 2 }}
-          id="phone"
-          variant="outlined"
-          label="Phone*"
-          defaultValue={`${userFromServer?.phone}`}
-          onChange={handleInputsChange}
-        />
-        <TextField
-          sx={{ mt: 2 }}
-          id="country"
-          variant="outlined"
-          label="Country*"
-          defaultValue={`${userFromServer?.address?.country}`}
-          onChange={handleInputsChange}
-        />
-        <TextField
-          sx={{ mt: 2 }}
-          id="city"
-          variant="outlined"
-          label="City*"
-          defaultValue={`${userFromServer?.address?.city}`}
-          onChange={handleInputsChange}
-        />
-        <TextField
-          sx={{ mt: 2 }}
-          id="state"
-          variant="outlined"
-          label="State"
-          defaultValue={`${userFromServer?.address?.state}`}
-          onChange={handleInputsChange}
-        />
-        <TextField
-          sx={{ mt: 2 }}
-          id="street"
-          variant="outlined"
-          label="Street*"
-          defaultValue={`${userFromServer?.address?.street}`}
-          onChange={handleInputsChange}
-        />
-        <TextField
-          sx={{ mt: 2 }}
-          id="houseName"
-          variant="outlined"
-          label="House number"
-          defaultValue={`${userFromServer?.address?.houseNumber}`}
-          onChange={handleInputsChange}
-        />
-        <TextField
-          sx={{ mt: 2 }}
-          id="zip"
-          variant="outlined"
-          label="Zip*"
-          defaultValue={`${userFromServer?.address?.zip}`}
-          onChange={handleInputsChange}
-        />
-      </Box>
-      <Button
-        variant="contained"
-        sx={{ mt: 2, mb: 2 }}
-        onClick={handleSubmit}
-        fullWidth
+    <Container>
+      <Box
+        sx={{
+          marginTop: 12,
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+        }}
       >
-        APDATE
-      </Button>
+        <Typography component="h1" variant="h5">
+          Edit profile{" "}
+        </Typography>
+
+        <Grid sx={{ width: "60vw" }}>
+          <Box sx={{ mt: 1, display: "flex", flexDirection: "column" }}>
+            <TextField
+              sx={{ mt: 2 }}
+              id="first"
+              variant="outlined"
+              label="First Name"
+              value={inputsValue.first}
+              onChange={handleInputsChange}
+              required
+            />
+            {errorsState && errorsState.first && (
+              <Alert severity="warning">{errorsState.first}</Alert>
+            )}
+            <TextField
+              sx={{ mt: 2 }}
+              id="middle"
+              variant="outlined"
+              label="Middle name"
+              value={inputsValue.middle}
+              onChange={handleInputsChange}
+            />
+            {errorsState && errorsState.middle && (
+              <Alert severity="warning">{errorsState.middle}</Alert>
+            )}
+            <TextField
+              sx={{ mt: 2 }}
+              id="last"
+              variant="outlined"
+              label="Last name"
+              value={inputsValue.last}
+              onChange={handleInputsChange}
+              required
+            />
+            {errorsState && errorsState.last && (
+              <Alert severity="warning">{errorsState.last}</Alert>
+            )}
+            <TextField
+              sx={{ mt: 2 }}
+              id="phone"
+              variant="outlined"
+              label="Phone"
+              value={inputsValue.phone}
+              onChange={handleInputsChange}
+              required
+            />
+            {errorsState && errorsState.phone && (
+              <Alert severity="warning">{errorsState.phone}</Alert>
+            )}
+            <TextField
+              sx={{ mt: 2 }}
+              id="country"
+              variant="outlined"
+              label="Country"
+              value={inputsValue.country}
+              onChange={handleInputsChange}
+              required
+            />
+            {errorsState && errorsState.countery && (
+              <Alert severity="warning">{errorsState.countery}</Alert>
+            )}
+            <TextField
+              sx={{ mt: 2 }}
+              id="city"
+              variant="outlined"
+              label="City"
+              value={inputsValue.city}
+              onChange={handleInputsChange}
+              required
+            />
+            {errorsState && errorsState.city && (
+              <Alert severity="warning">{errorsState.city}</Alert>
+            )}
+            <TextField
+              sx={{ mt: 2 }}
+              id="state"
+              variant="outlined"
+              label="State"
+              value={inputsValue.state}
+              onChange={handleInputsChange}
+            />
+            {errorsState && errorsState.state && (
+              <Alert severity="warning">{errorsState.state}</Alert>
+            )}
+            <TextField
+              sx={{ mt: 2 }}
+              id="street"
+              variant="outlined"
+              label="Street"
+              value={inputsValue.street}
+              onChange={handleInputsChange}
+              required
+            />
+            {errorsState && errorsState.street && (
+              <Alert severity="warning">{errorsState.street}</Alert>
+            )}
+            <TextField
+              sx={{ mt: 2 }}
+              id="houseNumber"
+              variant="outlined"
+              label="House number"
+              value={inputsValue.houseNumber}
+              onChange={handleInputsChange}
+              required
+            />
+            {errorsState && errorsState.houseNumber && (
+              <Alert severity="warning">{errorsState.houseNumber}</Alert>
+            )}
+            <TextField
+              sx={{ mt: 2 }}
+              id="zip"
+              variant="outlined"
+              label="Zip"
+              value={inputsValue.zip}
+              onChange={handleInputsChange}
+            />
+            {errorsState && errorsState.zip && (
+              <Alert severity="warning">{errorsState.zip}</Alert>
+            )}
+          </Box>
+          <Button
+            variant="contained"
+            sx={{ mt: 2, mb: 2 }}
+            onClick={handleEditProfile}
+            fullWidth
+          >
+            UPDATE
+          </Button>
+        </Grid>
+      </Box>
     </Container>
   );
 };

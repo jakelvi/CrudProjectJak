@@ -8,25 +8,9 @@ const registerSchema = Joi.object({
   phone: Joi.string()
     .min(9)
     .max(11)
-    .pattern(/^\+?(972|0)(-)?0?(([23489]{1}\d{7})|[5]{1}\d{8})$/)
+    .pattern(/^\+?(972|0)(\-)?0?(([23489]{1}\d{7})|[5]{1}\d{8})$/)
     .required(),
-  email: Joi.string()
-    .email({ tlds: { allow: false } })
-    .min(5)
-    .required(),
-  password: Joi.string()
-    .pattern(
-      new RegExp(
-        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*-])[A-Za-z\d!@#$%^&*-]{6,}$/
-      )
-    )
-    .messages({
-      "string.pattern.base":
-        "password must be at least nine characters long and contain an uppercase letter, a lowercase letter, a number and one of the following characters !@#$%^&*-",
-    })
-    .min(7)
-    .max(20)
-    .required(),
+
   url: Joi.string().min(14).allow(""),
   alt: Joi.string().min(2).max(256).allow(""),
   state: Joi.string().min(2).max(256).allow(""),
@@ -37,7 +21,7 @@ const registerSchema = Joi.object({
   zip: Joi.number().min(2).max(256).allow(""),
 });
 
-const validateRegister = (inputToCheck) =>
+const validateEditProfile = (inputToCheck) =>
   validation(registerSchema, inputToCheck);
 
-export { validateRegister };
+export { validateEditProfile };

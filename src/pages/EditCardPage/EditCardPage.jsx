@@ -1,110 +1,52 @@
+import { useEffect, useState } from "react";
 import {
-  Alert,
-  Button,
   Container,
-  Divider,
-  Grid,
   TextField,
+  Grid,
   Typography,
+  Divider,
+  Button,
+  Alert,
 } from "@mui/material";
-import axios from "axios";
-import { useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import ROUTES from "../../routes/ROUTES";
+import axios from "axios";
+import { InputsValueObject } from "../CreateCardPage/InputsValueObject";
+import { NewDataInputs } from "./NewDataInputs";
+import { UpdateChangesClick } from "./UpdateChanges";
 import { toast } from "react-toastify";
-import { validateCreateCard } from "../../validation/cardValidation";
+
 const EditCardPage = () => {
-  const navigate = useNavigate();
-  const [inputsValue, setInputValue] = useState({
-    title: "",
-    subtitle: "",
-    phone: "",
-    add: "",
-    mail: "",
-    description: "",
-    web: "",
-    url: "",
-    alt: "",
-    state: "",
-    country: "",
-    city: "",
-    street: "",
-    houseNumber: "",
-    zip: "",
-  });
-  const { id: _id } = useParams();
   const [errorsState, setErrorsState] = useState(null);
+  const navigate = useNavigate();
+  const [inputsValue, setInputValue] = useState(InputsValueObject());
+  const { id: _id } = useParams();
+  useEffect(() => {
+    axios
+      .get("/cards/" + _id)
+      .then(({ data }) => {
+        setInputValue(NewDataInputs(data));
+      })
+      .catch((err) => {
+        toast.info(`Somthing is wrong with the server`, {
+          position: toast.POSITION.TOP_CENTER,
+        });
+      });
+  }, [_id]);
+
   const handleInputChange = (e) => {
     setInputValue((currentState) => ({
       ...currentState,
       [e.target.id]: e.target.value,
     }));
   };
-  const handleUpdateChangesClick = async (e) => {
-    try {
-      e.preventDefault();
-      const joiResponse = validateCreateCard({
-        title: inputsValue.title,
-        subTitle: inputsValue.subtitle,
-        phone: inputsValue.phone,
-        email: inputsValue.mail,
-        description: inputsValue.description,
-        web: inputsValue.web,
-        url: inputsValue.url,
-        alt: inputsValue.alt,
-        state: inputsValue.state,
-        country: inputsValue.country,
-        city: inputsValue.city,
-        street: inputsValue.street,
-        houseNumber: inputsValue.houseNumber,
-        zip: inputsValue.zip,
-      });
-      setErrorsState(joiResponse);
-      if (joiResponse) return;
-      const errors = validateCreateCard(inputsValue);
-      if (errors) return;
-
-      const { data } = await axios.put(
-        `https://monkfish-app-z9uza.ondigitalocean.app/bcard2/cards/${_id}`,
-        {
-          title: inputsValue.title,
-          subtitle: inputsValue.subtitle,
-          description: inputsValue.description,
-          phone: inputsValue.phone,
-          email: inputsValue.mail,
-          web: inputsValue.web,
-          image: {
-            url: inputsValue.url,
-            alt: inputsValue.alt,
-          },
-          address: {
-            state: inputsValue.state,
-            country: inputsValue.country,
-            city: inputsValue.city,
-            street: inputsValue.street,
-            houseNumber: inputsValue.houseNumber,
-            zip: +inputsValue.zip,
-          },
-        }
-      );
-      navigate(ROUTES.HOME);
-    } catch (err) {
-      toast.error(err.response.data, {
-        position: "top-right",
-        autoClose: 5000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "colored",
-      });
-    }
+  const handleUpdateChangesClick = () => {
+    UpdateChangesClick(inputsValue, setErrorsState, navigate, _id);
   };
   return (
-    <Container sx={{ padding: "65px" }}>
+    <Container sx={{ padding: "50px", paddingBottom: "60px" }}>
       <Typography variant="h2" sx={{ mb: 1, padding: "10px", pb: "0px" }}>
-        Edit Card
+        Edit Your Card
       </Typography>
       <Typography variant="body1" sx={{ mb: 1, padding: "3px", ml: "7px" }}>
         Put a new values in the correct input
@@ -132,8 +74,8 @@ const EditCardPage = () => {
           value={inputsValue.subtitle}
           required
         />
-        {errorsState && errorsState.subTitle && (
-          <Alert severity="warning">{errorsState.subTitle}</Alert>
+        {errorsState && errorsState.subtitle && (
+          <Alert severity="warning">{errorsState.subtitle}</Alert>
         )}
         <TextField
           id="phone"
@@ -171,17 +113,18 @@ const EditCardPage = () => {
           <Alert severity="warning">{errorsState.web}</Alert>
         )}
         <TextField
-          id="mail"
+          id="email"
           label="Email"
           variant="outlined"
           sx={{ mt: "10px" }}
           onChange={handleInputChange}
-          value={inputsValue.mail}
+          value={inputsValue.email}
           required
         />
         {errorsState && errorsState.email && (
           <Alert severity="warning">{errorsState.email}</Alert>
         )}
+
         <TextField
           id="url"
           label="Url"
@@ -279,7 +222,13 @@ const EditCardPage = () => {
         <Grid item lg={8} md={8} sm={8} xs>
           <Button
             variant="outlined"
-            sx={{ mt: 2, width: "100%", ml: "0%", bgcolor: "lightskyblue" }}
+            sx={{
+              mt: 2,
+              width: "100%",
+              ml: "0%",
+              bgcolor: "primary.main",
+              color: "myblue.main",
+            }}
             onClick={handleUpdateChangesClick}
           >
             Update Changes
@@ -293,9 +242,9 @@ const EditCardPage = () => {
                 mt: 2,
                 width: "100%",
                 ml: "0%",
-                bgcolor: "navy",
-                color: "gray",
+                color: "primary.main",
               }}
+              onClick={<Link to={ROUTES.HOME}></Link>}
             >
               Discard Changes
             </Button>

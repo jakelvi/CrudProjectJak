@@ -20,6 +20,7 @@ import SandboxPage from "../pages/Sandbox/SandboxPage";
 const Router = () => {
   return (
     <Routes>
+      <Route path={"/"} element={<HomePage />} />
       <Route path={ROUTES.HOME} element={<HomePage />} />
       <Route path={ROUTES.REGISTER} element={<RegisterPage />} />
       <Route path={ROUTES.LOGIN} element={<LoginPage />} />

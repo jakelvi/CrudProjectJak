@@ -19,7 +19,7 @@ import { darkThemeActions } from "../../store/darkThemeSlice";
 import DarkModeIcon from "@mui/icons-material/DarkMode";
 import LightModeIcon from "@mui/icons-material/LightMode";
 
-const HeaderComponent = ({ isDarkTheme, onThemeChange }) => {
+const HeaderComponent = ({ isDarkTheme }) => {
   const [anchorEl, setAnchorEl] = useState(null);
   const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = useState(null);
   const [isOpen, setIsOpen] = useState(false);
@@ -59,14 +59,6 @@ const HeaderComponent = ({ isDarkTheme, onThemeChange }) => {
     localStorage.removeItem("token");
     document.location = "/";
   };
-  // React.useEffect(() => {
-  //   axios
-  //     .patch(`https://monkfish-app-z9uza.ondigitalocean.app/bcard2/users/${id}`)
-  //     .then(({ data }) => {
-  //       setUserFromServer(data);
-  //     })
-  //     .catch((err) => {});
-  // }, []);
   const menuId = "primary-search-account-menu";
   const renderMenu = (
     <Menu

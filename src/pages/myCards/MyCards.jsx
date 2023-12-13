@@ -1,27 +1,23 @@
 import { Container, Grid } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import CardComponent from "../../components/CardComponent";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
-import useQueryParams from "../../hooks/useQueryParams";
 import homePageNormalization from "../home/homePageNormalization";
 import axios from "axios";
 import ROUTES from "../../routes/ROUTES";
 import { toast } from "react-toastify";
-
 let initialDataFromServer = [];
 
 const MyCardsPage = () => {
   const [dataFromServer, setDataFromServer] = useState([]);
   const navigate = useNavigate();
   const userData = useSelector((bigPie) => bigPie.authSlice.userData);
-  const isAdmin = useSelector((bigPie) => bigPie.authSlice.isAdmin);
-  const id = useSelector((bigPie) => bigPie.authSlice.id);
 
   useEffect(() => {
     axios
       .get(
-        `https://monkfish-app-z9uza.ondigitalocean.app/bcard2/cards/my-cards/`
+        "https://monkfish-app-z9uza.ondigitalocean.app/bcard2/cards/my-cards/"
       )
       .then(({ data }) => {
         if (userData) data = homePageNormalization(data, userData._id);
@@ -40,7 +36,7 @@ const MyCardsPage = () => {
           theme: "colored",
         });
       });
-  }, []);
+  }, [userData]);
 
   const handleDeleteCard = async (_id) => {
     try {
